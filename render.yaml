@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: tapimon
+    runtime: docker
+    dockerfilePath: ./docker/web/Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        value: tapimon
+      - key: DB_USER
+        value: tapimon
+      - key: DB_PASS
+        generateValue: true
+      - key: PORT
+        value: 10000

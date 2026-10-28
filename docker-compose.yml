@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  web:
+    build: ./docker/web
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./sql:/var/www/html/sql:ro
+    environment:
+      DB_HOST: db
+      DB_NAME: tapimon
+      DB_USER: tapimon
+      DB_PASS: tapimonpass
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: tapimon
+      MYSQL_USER: tapimon
+      MYSQL_PASSWORD: tapimonpass
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d:ro
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8082:80"
+    depends_on:
+      - db
+volumes:
+  db_data:
